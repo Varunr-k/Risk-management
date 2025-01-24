@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Risk Management Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .risk-table th, .risk-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .risk-table th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input {
+            margin: 5px;
+            padding: 10px;
+            width: calc(100% - 24px);
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Interactive Risk Management Tool</h1>
+    </header>
+    <main>
+        <h2>Add a New Risk</h2>
+        <form id="risk-form">
+            <input type="text" id="description" placeholder="Description" required />
+            <input type="number" id="impact" placeholder="Impact (1-10)" min="1" max="10" required />
+            <input type="number" id="probability" placeholder="Probability (1-10)" min="1" max="10" required />
+            <button type="submit">Add Risk</button>
+        </form>
+
+        <h2>Risks</h2>
+        <table class="risk-table" id="risk-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Impact</th>
+                    <th>Probability</th>
+                    <th>Risk Score</th>
+                    <th>Mitigation Strategy</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button onclick="analyzeRisks()">Analyze Risks</button>
+    </main>
+
+    <script>
+        const risks = []; 
+        const strategies = {
+            "Server downtime": "Increase server redundancy and monitor performance.",
+            "Data breach": "Enhance security protocols and train employees.",
+            "Budget overrun": "Reassess project scope and monitor expenses closely.",
+            "Team burnout": "Implement work-life balance policies and monitor workloads."
+        };
+
+        document.getElementById("risk-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const description = document.getElementById("description").value;
+            const impact = parseInt(document.getElementById("impact").value);
+            const probability = parseInt(document.getElementById("probability").value);
+
+            risks.push({ description, impact, probability });
+            document.getElementById("risk-form").reset();
+            displayRisks();
+        });
+
+        function displayRisks() {
+            const tableBody = document.querySelector("#risk-table tbody");
+            tableBody.innerHTML = risks.map((risk, index) => `
+                <tr>
+                    <td>${risk.description}</td>
+                    <td>${risk.impact}</td>
+                    <td>${risk.probability}</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            `).join('');
+        }
+
+        function analyzeRisks() {
+            const tableBody = document.querySelector("#risk-table tbody");
+            tableBody.innerHTML = risks
+                .map(risk => {
+                    const riskScore = risk.impact * risk.probability;
+                    const mitigation = strategies[risk.description] || "No strategy available.";
+                    return { ...risk, riskScore, mitigation };
+                })
+                .sort((a, b) => b.riskScore - a.riskScore)
+                .map(risk => `
+                    <tr>
+                        <td>${risk.description}</td>
+                        <td>${risk.impact}</td>
+                        <td>${risk.probability}</td>
+                        <td>${risk.riskScore}</td>
+                        <td>${risk.mitigation}</td>
+                    </tr>
+                `)
+                .join('');
+        }
+    </script>
+</body>
+</html>
